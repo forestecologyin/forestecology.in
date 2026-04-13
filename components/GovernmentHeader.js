@@ -1,5 +1,7 @@
+"use client";
+
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -14,6 +16,7 @@ const links = [
 export default function GovernmentHeader() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -25,11 +28,11 @@ export default function GovernmentHeader() {
 
   useEffect(() => {
     links.forEach((link) => {
-      if (link.href !== router.pathname) {
+      if (link.href !== pathname) {
         router.prefetch(link.href);
       }
     });
-  }, [router]);
+  }, [pathname, router]);
 
   return (
     <header
@@ -77,7 +80,7 @@ export default function GovernmentHeader() {
                 key={link.href}
                 href={link.href}
                 className={`rounded-full px-3 py-1.5 text-sm font-medium transition-all ${
-                  router.pathname === link.href
+                  pathname === link.href
                     ? "text-[#8BDDB9]"
                     : "text-[#D6F1E3] hover:text-white"
                 }`}
@@ -136,7 +139,7 @@ export default function GovernmentHeader() {
                     href={link.href}
                     onClick={() => setOpen(false)}
                     className={`rounded-md px-3 py-2 text-[18px] font-medium tracking-[0.01em] leading-tight transition-all duration-200 active:scale-[0.98] ${
-                      router.pathname === link.href
+                      pathname === link.href
                         ? "bg-transparent text-[#8BDDB9]"
                         : "bg-transparent border-transparent text-[#D6F1E3] hover:text-white"
                     }`}

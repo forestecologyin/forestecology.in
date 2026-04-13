@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+import SiteChrome from "./SiteChrome";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://forest-ecology-lab.vercel.app";
 
@@ -16,7 +17,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <SiteChrome>{children}</SiteChrome>
+      </body>
     </html>
   );
 }

@@ -1,8 +1,7 @@
+"use client";
+
 import { useState, useEffect } from "react";
-import Head from "next/head";
 import { motion } from "framer-motion";
-import GovernmentHeader from "../../components/GovernmentHeader";
-import Footer from "../../components/Footer/Footer";
 import { cleanupChannel, supabase } from "@/lib/supabase";
 import { SITE_SETTING_DEFAULTS } from "@/lib/siteSettingKeys";
 
@@ -26,7 +25,7 @@ async function loadContactInfo() {
   };
 }
 
-export default function ContactPage() {
+export default function ContactPageClient() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -96,11 +95,6 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-[#081C15] text-[#E8F8EE]">
-      <Head>
-        <title>Forest Ecology Lab | Contact</title>
-        <meta name="description" content="Contact the Forest Ecology Lab for collaboration, field research, and academic partnerships." />
-      </Head>
-      <GovernmentHeader />
       <main className="mx-auto max-w-6xl px-6 pb-16 pt-20">
         <motion.section
           initial={{ opacity: 0, y: 18 }}
@@ -184,9 +178,7 @@ export default function ContactPage() {
                 placeholder="Your message..."
               />
             </div>
-            {submitError && (
-              <p className="text-sm text-red-300">{submitError}</p>
-            )}
+            {submitError && <p className="text-sm text-red-300">{submitError}</p>}
             {submitted && (
               <motion.p
                 initial={{ opacity: 0, y: 8 }}
@@ -201,12 +193,11 @@ export default function ContactPage() {
               disabled={sending}
               className="rounded-full border border-[#63D3A6] bg-[#63D3A630] px-8 py-3 text-sm font-medium text-[#E8F8EE] transition hover:bg-[#63D3A640] focus:outline-none focus:ring-2 focus:ring-[#63D3A6] focus:ring-offset-2 focus:ring-offset-[#081C15] disabled:opacity-50"
             >
-              {sending ? "Sending…" : "Send message"}
+              {sending ? "Sending..." : "Send message"}
             </button>
           </form>
         </motion.section>
       </main>
-      <Footer />
     </div>
   );
 }

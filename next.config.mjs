@@ -7,13 +7,16 @@ const localNodeModules = path.join(__dirname, "node_modules");
 const localTailwindcss = path.join(localNodeModules, "tailwindcss");
 
 const isProd = process.env.NODE_ENV === "production";
+const isVercel = process.env.VERCEL === "1";
+const configuredBasePath = process.env.NEXT_BASE_PATH;
+const basePath = isProd ? (configuredBasePath ?? (isVercel ? "/babysit" : "")) : "";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Commented out static export to enable authentication
   // output: "export",
-  basePath: isProd ? "/forest2" : "",
-  assetPrefix: isProd ? "/forest2/" : "",
+  basePath,
+  assetPrefix: basePath ? `${basePath}/` : "",
   images: {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 60 * 60 * 24 * 7,
