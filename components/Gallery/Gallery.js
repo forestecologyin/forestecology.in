@@ -3,7 +3,7 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { optimizeCloudinaryUrl } from "@/lib/cloudinary";
 import { cleanupChannel, supabase } from "@/lib/supabase";
 import image1 from "../../images/1.jpeg";
@@ -47,8 +47,20 @@ export default function Gallery() {
   const [failedImageIds, setFailedImageIds] = useState({});
   const [dbImages, setDbImages] = useState([]);
 
+  const fetchFromSupabase = useCallback(async () => {
+    try {
+      const { data } = await supabase
+        .from("gallery")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (data) setDbImages(data);
+    } catch {}
+  }, []);
+
   useEffect(() => {
-    fetchFromSupabase();
+    const initialFetchTimeout = window.setTimeout(() => {
+      fetchFromSupabase();
+    }, 0);
 
     const channel = supabase
       .channel("gallery-realtime")
@@ -57,18 +69,11 @@ export default function Gallery() {
       })
       .subscribe();
 
-    return () => cleanupChannel(channel);
-  }, []);
-
-  async function fetchFromSupabase() {
-    try {
-      const { data } = await supabase
-        .from("gallery")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (data) setDbImages(data);
-    } catch {}
-  }
+    return () => {
+      window.clearTimeout(initialFetchTimeout);
+      cleanupChannel(channel);
+    };
+  }, [fetchFromSupabase]);
 
   const images = [
     ...hardcodedImages,

@@ -77,10 +77,6 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
-    setActiveImageIndex((i) => (heroUrls.length ? i % heroUrls.length : 0));
-  }, [heroUrls.length]);
-
-  useEffect(() => {
     if (!heroUrls.length) return undefined;
     const timer = setInterval(() => {
       setActiveImageIndex((prev) => (prev + 1) % heroUrls.length);
@@ -96,17 +92,15 @@ export default function Hero() {
   const goPrev = () => goTo(activeImageIndex - 1);
   const goNext = () => goTo(activeImageIndex + 1);
 
-  const currentSrc = heroUrls[activeImageIndex] || "";
+  const safeActiveIndex = heroUrls.length ? activeImageIndex % heroUrls.length : 0;
+  const currentSrc = heroUrls[safeActiveIndex] || "";
   const displaySrc = failedSrcs[currentSrc]
-    ? `/placeholders/gallery.svg?v=${activeImageIndex}`
+    ? `/placeholders/gallery.svg?v=${safeActiveIndex}`
     : currentSrc;
-  const imageKey = `${activeImageIndex}-${visibleSrc}`;
+  const imageKey = `${safeActiveIndex}-${visibleSrc}`;
 
   useEffect(() => {
-    if (!displaySrc) {
-      setVisibleSrc("/placeholders/gallery.svg");
-      return;
-    }
+    if (!displaySrc) return;
 
     let cancelled = false;
     const preload = new window.Image();
@@ -119,21 +113,21 @@ export default function Hero() {
       if (currentSrc && !failedSrcs[currentSrc]) {
         setFailedSrcs((prev) => ({ ...prev, [currentSrc]: true }));
       }
-      setVisibleSrc(`/placeholders/gallery.svg?v=${activeImageIndex}`);
+      setVisibleSrc(`/placeholders/gallery.svg?v=${safeActiveIndex}`);
     };
 
     return () => {
       cancelled = true;
     };
-  }, [activeImageIndex, currentSrc, displaySrc, failedSrcs]);
+  }, [currentSrc, displaySrc, failedSrcs, safeActiveIndex]);
 
   useEffect(() => {
     if (!heroUrls.length) return;
-    const nextSrc = heroUrls[(activeImageIndex + 1) % heroUrls.length];
+    const nextSrc = heroUrls[(safeActiveIndex + 1) % heroUrls.length];
     if (!nextSrc) return;
     const preloadNext = new window.Image();
     preloadNext.src = nextSrc;
-  }, [activeImageIndex, heroUrls]);
+  }, [heroUrls, safeActiveIndex]);
 
   return (
     <section id="home" className="relative min-h-screen w-full overflow-hidden bg-[#081C15]">
@@ -151,7 +145,7 @@ export default function Hero() {
               src={visibleSrc || "/placeholders/gallery.svg"}
               alt="Forest Ecology hero slide"
               fill
-              priority={activeImageIndex === 0}
+              priority={safeActiveIndex === 0}
               sizes="100vw"
               className="object-cover object-center"
             />
@@ -189,7 +183,7 @@ export default function Hero() {
             type="button"
             onClick={() => goTo(i)}
             className={`h-1.5 w-2 flex-none rounded-sm transition-colors md:h-1.5 md:min-w-[20px] md:max-w-[32px] md:flex-1 ${
-              i === activeImageIndex ? "bg-[#63D3A6]" : "bg-white/80"
+              i === safeActiveIndex ? "bg-[#63D3A6]" : "bg-white/80"
             }`}
             aria-label={`Go to image ${i + 1} of ${heroUrls.length}`}
           />

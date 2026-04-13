@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -19,6 +19,23 @@ export default function ProtectedLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
 
+  const checkAuth = useCallback(async () => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        router.push("/admin/login");
+        return;
+      }
+      setUser(user);
+    } catch {
+      router.push("/admin/login");
+    } finally {
+      setLoading(false);
+    }
+  }, [router]);
+
   useEffect(() => {
     setMounted(true);
     checkAuth();
@@ -34,24 +51,7 @@ export default function ProtectedLayout({ children }) {
     });
 
     return () => subscription.unsubscribe();
-  }, [router]);
-
-  async function checkAuth() {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
-        router.push("/admin/login");
-        return;
-      }
-      setUser(user);
-    } catch {
-      router.push("/admin/login");
-    } finally {
-      setLoading(false);
-    }
-  }
+  }, [checkAuth, router]);
 
   if (!mounted || loading) {
     return (

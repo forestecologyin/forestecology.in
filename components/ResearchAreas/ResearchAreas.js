@@ -59,17 +59,11 @@ function normalizeResearchGallery(row) {
 const ResearchModal = dynamic(() => import("./ResearchModal"), { ssr: false });
 
 function ImageWithFallback({ src, alt }) {
-  const [currentSrc, setCurrentSrc] = useState(src);
   const [failed, setFailed] = useState(false);
-
-  useEffect(() => {
-    setCurrentSrc(src);
-    setFailed(false);
-  }, [src]);
 
   return (
     <Image
-      src={failed ? "/placeholders/research.svg" : currentSrc}
+      src={failed ? "/placeholders/research.svg" : src}
       alt={alt}
       fill
       loading="lazy"
@@ -77,7 +71,6 @@ function ImageWithFallback({ src, alt }) {
       className="object-cover transition duration-700 group-hover:scale-110"
       onError={() => {
         setFailed(true);
-        setCurrentSrc("/placeholders/research.svg");
       }}
     />
   );
@@ -102,7 +95,9 @@ export default function ResearchAreas() {
   }, []);
 
   useEffect(() => {
-    loadIntro();
+    const initialLoadTimeout = window.setTimeout(() => {
+      loadIntro();
+    }, 0);
     const ch = supabase
       .channel("site-settings-research-intro")
       .on("postgres_changes", { event: "*", schema: "public", table: "site_settings" }, (payload) => {
@@ -112,26 +107,12 @@ export default function ResearchAreas() {
       })
       .subscribe();
     return () => {
+      window.clearTimeout(initialLoadTimeout);
       cleanupChannel(ch);
     };
   }, [loadIntro]);
 
-  useEffect(() => {
-    fetchFromSupabase();
-
-    const channel = supabase
-      .channel("research-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "research" }, () => {
-        fetchFromSupabase();
-      })
-      .subscribe();
-
-    return () => {
-      cleanupChannel(channel);
-    };
-  }, []);
-
-  async function fetchFromSupabase() {
+  const fetchFromSupabase = useCallback(async () => {
     try {
       const { data } = await supabase
         .from("research")
@@ -141,7 +122,25 @@ export default function ResearchAreas() {
     } catch {
       /* ignore */
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    const initialFetchTimeout = window.setTimeout(() => {
+      fetchFromSupabase();
+    }, 0);
+
+    const channel = supabase
+      .channel("research-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "research" }, () => {
+        fetchFromSupabase();
+      })
+      .subscribe();
+
+    return () => {
+      window.clearTimeout(initialFetchTimeout);
+      cleanupChannel(channel);
+    };
+  }, [fetchFromSupabase]);
 
   const researchTopics = [
     ...hardcodedTopics.map((t) => ({
@@ -197,6 +196,7 @@ export default function ResearchAreas() {
           >
             <div className="relative aspect-[16/9] overflow-hidden">
               <ImageWithFallback
+                key={String(topic.cover)}
                 src={topic.cover}
                 alt={`${topic.title} visual`}
               />

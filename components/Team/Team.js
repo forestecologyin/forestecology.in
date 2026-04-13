@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { optimizeCloudinaryUrl } from "@/lib/cloudinary";
 import { cleanupChannel, supabase } from "@/lib/supabase";
 import { defaultCollaborators } from "@/lib/collaboratorsDefaults";
@@ -120,20 +120,17 @@ function memberBioParagraphs(m) {
 }
 
 function ProfileImageWithFallback({ src, alt, className }) {
-  const [currentSrc, setCurrentSrc] = useState(src);
   const [failed, setFailed] = useState(false);
-
-  useEffect(() => { setCurrentSrc(src); setFailed(false); }, [src]);
 
   return (
     <Image
-      src={failed ? "/placeholders/profile.svg" : currentSrc}
+      src={failed ? "/placeholders/profile.svg" : src}
       alt={alt}
       fill
       loading="lazy"
       sizes="(max-width: 768px) 100vw, 33vw"
       className={className}
-      onError={() => { setFailed(true); setCurrentSrc("/placeholders/profile.svg"); }}
+      onError={() => { setFailed(true); }}
     />
   );
 }
@@ -144,37 +141,7 @@ export default function Team() {
   const [collaborators, setCollaborators] = useState([]);
   const [head, ...teamMembers] = members;
 
-  useEffect(() => {
-    fetchFromSupabase();
-
-    const channel = supabase
-      .channel("team-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "team" }, () => {
-        fetchFromSupabase();
-      })
-      .subscribe();
-
-    return () => {
-      cleanupChannel(channel);
-    };
-  }, []);
-
-  useEffect(() => {
-    fetchCollaborators();
-
-    const channel = supabase
-      .channel("collaborators-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "collaborators" }, () => {
-        fetchCollaborators();
-      })
-      .subscribe();
-
-    return () => {
-      cleanupChannel(channel);
-    };
-  }, []);
-
-  async function fetchFromSupabase() {
+  const fetchFromSupabase = useCallback(async () => {
     try {
       const { data } = await supabase
         .from("team")
@@ -184,9 +151,9 @@ export default function Team() {
     } catch {
       /* ignore */
     }
-  }
+  }, []);
 
-  async function fetchCollaborators() {
+  const fetchCollaborators = useCallback(async () => {
     try {
       const { data } = await supabase
         .from("collaborators")
@@ -197,7 +164,43 @@ export default function Team() {
     } catch {
       /* ignore */
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    const initialFetchTimeout = window.setTimeout(() => {
+      fetchFromSupabase();
+    }, 0);
+
+    const channel = supabase
+      .channel("team-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "team" }, () => {
+        fetchFromSupabase();
+      })
+      .subscribe();
+
+    return () => {
+      window.clearTimeout(initialFetchTimeout);
+      cleanupChannel(channel);
+    };
+  }, [fetchFromSupabase]);
+
+  useEffect(() => {
+    const initialFetchTimeout = window.setTimeout(() => {
+      fetchCollaborators();
+    }, 0);
+
+    const channel = supabase
+      .channel("collaborators-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "collaborators" }, () => {
+        fetchCollaborators();
+      })
+      .subscribe();
+
+    return () => {
+      window.clearTimeout(initialFetchTimeout);
+      cleanupChannel(channel);
+    };
+  }, [fetchCollaborators]);
 
   const collaboratorList =
     collaborators.length > 0
@@ -240,7 +243,7 @@ export default function Team() {
         className="mt-12 grid gap-6 rounded-3xl border border-[#63D3A650] bg-[#123325]/48 p-6 shadow-[0_18px_50px_rgba(0,0,0,0.28)] md:grid-cols-[220px_1fr]"
       >
         <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-white/20">
-          <ProfileImageWithFallback src={head.photo} alt={`${head.name} portrait`} className="object-cover" />
+          <ProfileImageWithFallback key={String(head.photo)} src={head.photo} alt={`${head.name} portrait`} className="object-cover" />
         </div>
         <div>
           <h3 className="text-3xl font-semibold text-[#ECF9F1] md:text-4xl">{head.name}</h3>
@@ -270,7 +273,7 @@ export default function Team() {
             className="rounded-2xl border border-white/10 bg-[#123325]/42 p-5 shadow-[0_16px_44px_rgba(0,0,0,0.28)]"
           >
             <div className="relative mb-4 aspect-square w-full overflow-hidden rounded-xl border border-white/15">
-              <ProfileImageWithFallback src={member.photo} alt={`${member.name} profile`} className="object-cover" />
+              <ProfileImageWithFallback key={String(member.photo)} src={member.photo} alt={`${member.name} profile`} className="object-cover" />
             </div>
             <h3 className="text-lg font-semibold text-[#ECF9F1]">{member.name}</h3>
             <p className="mt-1 text-sm text-[#8CE0BD]">{member.role}</p>
@@ -329,6 +332,7 @@ export default function Team() {
             <div className="relative aspect-square w-full overflow-hidden border-b border-white/10">
               {person.image_url ? (
                 <ProfileImageWithFallback
+                  key={String(person.image_url)}
                   src={optimizeCloudinaryUrl(person.image_url)}
                   alt={person.name}
                   className="object-cover"
