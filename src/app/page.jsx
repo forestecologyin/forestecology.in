@@ -4,7 +4,6 @@ import HomeAbout from "../../components/Home/HomeAbout";
 import ResearchAreas from "../../components/ResearchAreas/ResearchAreas";
 import Gallery from "../../components/Gallery/Gallery";
 import Team from "../../components/Team/Team";
-import Footer from "../../components/Footer/Footer";
 
 export const metadata = {
   title: "Forest Ecology Lab | Home",
@@ -17,7 +16,6 @@ export default function Page() {
     <div className="relative overflow-x-hidden bg-[#081C15] text-[#E8F8EE]">
       <GovernmentHeader />
       <Hero />
-      <Footer />
     </div>
   );
 }
