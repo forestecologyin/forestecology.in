@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import GovernmentHeader from "@/components/GovernmentHeader";
 import Footer from "@/components/Footer/Footer";
+import { MaintenanceWrapper } from "@/components/MaintenanceWrapper";
 
 export default function SiteChrome({ children }) {
   const pathname = usePathname() || "";
@@ -13,10 +14,12 @@ export default function SiteChrome({ children }) {
   }
 
   return (
-    <div className="min-w-0 w-full max-w-[100vw] overflow-x-hidden">
-      <GovernmentHeader />
-      {children}
-      <Footer />
-    </div>
+    <MaintenanceWrapper>
+      <div className="min-w-0 w-full max-w-[100vw] overflow-x-hidden">
+        <GovernmentHeader />
+        {children}
+        <Footer />
+      </div>
+    </MaintenanceWrapper>
   );
 }

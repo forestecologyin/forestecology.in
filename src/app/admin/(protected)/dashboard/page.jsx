@@ -5,6 +5,7 @@ import Image from "next/image";
 import { cleanupChannel, supabase } from "@/lib/supabase";
 import { optimizeCloudinaryUrl } from "@/lib/cloudinary";
 import StatCard from "@/components/admin/StatCard";
+import { MaintenanceModeToggle } from "@/components/admin/MaintenanceModeToggle";
 import Link from "next/link";
 import {
   HiOutlinePhotograph,
@@ -124,6 +125,13 @@ export default function DashboardPage() {
         <p className="text-sm text-gray-500 mt-1">
           Overview updates live as the public site and forms change.
         </p>
+      </div>
+
+      <div className="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded-lg">
+        <h3 className="text-lg font-semibold text-yellow-900 mb-4">
+          Site Maintenance
+        </h3>
+        <MaintenanceModeToggle />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -252,9 +260,9 @@ export default function DashboardPage() {
                   <p className="text-xs text-gray-400 mt-0.5">
                     {m.created_at
                       ? new Date(m.created_at).toLocaleString(undefined, {
-                          dateStyle: "short",
-                          timeStyle: "short",
-                        })
+                        dateStyle: "short",
+                        timeStyle: "short",
+                      })
                       : ""}
                   </p>
                 </li>
