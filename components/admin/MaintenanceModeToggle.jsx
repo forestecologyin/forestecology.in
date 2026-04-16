@@ -8,7 +8,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
-import { HiWrench } from "react-icons/hi";
+import { MdBuild } from "react-icons/md";
 
 export function MaintenanceModeToggle() {
     const [isEnabled, setIsEnabled] = useState(false);
@@ -79,7 +79,7 @@ export function MaintenanceModeToggle() {
             <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-3">
                     <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-yellow-50">
-                        <HiWrench className="w-6 h-6 text-yellow-600" />
+                        <MdBuild className="w-6 h-6 text-yellow-600" />
                     </div>
                     <div>
                         <h3 className="font-semibold text-gray-900">Maintenance Mode</h3>
