@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FiTree } from "react-icons/fi";
+import { MdEco } from "react-icons/md";
 
 export default function MaintenancePage() {
     const [isVisible, setIsVisible] = useState(false);
@@ -33,7 +33,7 @@ export default function MaintenancePage() {
                     <div className="px-8 md:px-12 py-12 md:py-16 text-center">
                         {/* Leaf Icon */}
                         <div className="inline-flex items-center justify-center w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-emerald-100 to-teal-100 animate-pulse">
-                            <FiTree className="w-8 h-8 text-emerald-600" />
+                            <MdEco className="w-8 h-8 text-emerald-600" />
                         </div>
 
                         {/* Main Heading */}
