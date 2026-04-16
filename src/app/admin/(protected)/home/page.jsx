@@ -242,7 +242,7 @@ export default function HomeContentPage() {
         </p>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">About heading</label>
+            <label className="block text-sm font-bold text-green-700 mb-1">About heading</label>
             <input
               type="text"
               value={settings.home_about_title}
@@ -251,7 +251,7 @@ export default function HomeContentPage() {
             />
           </div>
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">About body</label>
+            <label className="block text-sm font-bold text-green-700 mb-1">About body</label>
             <textarea
               value={settings.home_about_body}
               onChange={(e) => setSettings((p) => ({ ...p, home_about_body: e.target.value }))}
@@ -260,7 +260,7 @@ export default function HomeContentPage() {
             />
           </div>
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Research areas intro</label>
+            <label className="block text-sm font-bold text-green-700 mb-1">Research areas intro</label>
             <textarea
               value={settings.research_intro}
               onChange={(e) => setSettings((p) => ({ ...p, research_intro: e.target.value }))}
@@ -269,7 +269,7 @@ export default function HomeContentPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Contact email (display)</label>
+            <label className="block text-sm font-bold text-green-700 mb-1">Contact email (display)</label>
             <input
               type="text"
               value={settings.contact_email}
@@ -278,7 +278,7 @@ export default function HomeContentPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Contact phone (display)</label>
+            <label className="block text-sm font-bold text-green-700 mb-1">Contact phone (display)</label>
             <input
               type="text"
               value={settings.contact_phone}
