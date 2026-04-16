@@ -79,7 +79,7 @@ export function MaintenanceModeToggle() {
             <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-3">
                     <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-yellow-50">
-                        <HiOutlineWrench className="w-6 h-6 text-yellow-600" />
+                        <HiWrench className="w-6 h-6 text-yellow-600" />
                     </div>
                     <div>
                         <h3 className="font-semibold text-gray-900">Maintenance Mode</h3>
