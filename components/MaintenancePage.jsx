@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FiLeaf } from "react-icons/fi";
+import { FiTree } from "react-icons/fi";
 
 export default function MaintenancePage() {
     const [isVisible, setIsVisible] = useState(false);
@@ -22,8 +22,8 @@ export default function MaintenancePage() {
             {/* Main content card */}
             <div
                 className={`relative z-10 w-full max-w-2xl transform transition-all duration-1000 ${isVisible
-                        ? "opacity-100 scale-100 translate-y-0"
-                        : "opacity-0 scale-95 translate-y-10"
+                    ? "opacity-100 scale-100 translate-y-0"
+                    : "opacity-0 scale-95 translate-y-10"
                     }`}
             >
                 <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-emerald-100">
